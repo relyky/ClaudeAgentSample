@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(uv pip list:*)"
+      "Bash(uv pip list:*)",
+      "Bash(tree:*)",
+      "Bash(git mv:*)",
+      "Bash(uv sync:*)",
+      "Bash(python -c:*)",
+      "Bash(uv run python:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
