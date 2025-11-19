@@ -51,6 +51,9 @@ tools: file_edit, web_search, file_search
 - 安全要求(資料保護、權限控制等)
 - 相容性要求(裝置、瀏覽器支援等)
 
+### 3.1 功能地圖(Function Map)
+- 繪製功能地圖
+
 ### 4. 技術方案
 - 系統架構概述
 - 關鍵技術選型
