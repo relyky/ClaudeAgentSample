@@ -123,3 +123,60 @@ def get_env_value_as_int(key: str, default: int = None) -> int:
 	except ValueError:
 		print(f"⚠ 警告: 環境變數 {key}='{value_str}' 無法轉換為整數,使用預設值 {default}")
 		return default
+
+
+def get_env_value_as_bool(key: str, default: bool = False) -> bool:
+	"""
+	取得環境變數值並轉換為布林值
+
+	Args:
+		key: 環境變數鍵名
+		default: 預設值 (當環境變數不存在或為空時使用)
+
+	Returns:
+		布林值,如果無法判斷則返回預設值
+
+	True 的值: "true", "1", "yes", "on" (不區分大小寫)
+	False 的值: "false", "0", "no", "off" (不區分大小寫)
+
+	Example:
+		>>> get_env_value_as_bool("DEBUG", False)
+		True
+
+		>>> get_env_value_as_bool("PRODUCTION", False)
+		False
+	"""
+	value_str = get_env_value(key, "")
+
+	# 如果環境變數不存在或為空,返回預設值
+	if not value_str:
+		return default
+
+	# 轉換為小寫進行比較
+	value_lower = value_str.lower().strip()
+
+	# True 的值
+	if value_lower in ("true", "1", "yes", "on"):
+		return True
+
+	# False 的值
+	if value_lower in ("false", "0", "no", "off"):
+		return False
+
+	# 無法識別的值,使用預設值並顯示警告
+	print(f"⚠ 警告: 環境變數 {key}='{value_str}' 無法轉換為布林值,使用預設值 {default}")
+	return default
+
+
+def is_debug_mode() -> bool:
+	"""
+	判斷是否在除錯模式
+
+	Returns:
+		True 表示開發/除錯環境, False 表示生產環境
+
+	Example:
+		>>> if is_debug_mode():
+		...     print("開發模式:顯示詳細日誌")
+	"""
+	return get_env_value_as_bool("DEBUG", False)

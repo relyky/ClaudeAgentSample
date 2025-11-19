@@ -1,18 +1,21 @@
 import asyncio
 from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, AssistantMessage, TextBlock, ResultMessage, ToolUseBlock
-from load_env_files import load_env_files, get_env_value, get_env_value_as_int, validate_api_key
-
+from load_env_files import is_debug_mode, load_env_files, get_env_value, get_env_value_as_int, validate_api_key
 
 async def main():
 	# 載入環境變數
 	load_env_files()
 
-	# 驗證 API 金鑰
-	is_valid, error_msg = validate_api_key()
-	if not is_valid:
-		print(f"❌ 錯誤: {error_msg}")
-		print("請在 .env.local 檔案中設定您的 API 金鑰")
-		return
+	if is_debug_mode():
+		print("[開發模式]")
+	
+	# 驗證 API 金鑰，當非開發模式才進行檢查。
+	if not is_debug_mode():
+		is_valid, error_msg = validate_api_key()
+		if not is_valid:
+			print(f"❌ 錯誤: {error_msg}")
+			print("請在 .env.local 檔案中設定您的 API 金鑰")
+			return
 
 	# 讀取參數值
 	model = get_env_value("CLAUDE_MODEL", "claude-sonnet-4-5-20250929")
