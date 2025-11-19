@@ -1,22 +1,40 @@
 import asyncio
 from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, AssistantMessage, TextBlock, ResultMessage, ToolUseBlock
+from load_env_files import load_env_files, get_env_value, get_env_value_as_int, validate_api_key
+
 
 async def main():
-  # ClaudeAgentOptions 用於設定 AI 模型的行為參數
+	# 載入環境變數
+	load_env_files()
+
+	# 驗證 API 金鑰
+	is_valid, error_msg = validate_api_key()
+	if not is_valid:
+		print(f"❌ 錯誤: {error_msg}")
+		print("請在 .env.local 檔案中設定您的 API 金鑰")
+		return
+
+	# 讀取參數值
+	model = get_env_value("CLAUDE_MODEL", "claude-sonnet-4-5-20250929")
+	system_prompt = get_env_value("CLAUDE_SYSTEM_PROMPT","你是一個樂於助人的助手。你的母語是中文以台灣口語為主。展示你的工作步驟。")
+	max_turns = get_env_value_as_int("MAX_TURNS", None)
+
+	# ClaudeAgentOptions 用於設定 AI 模型的行為參數
 	options = ClaudeAgentOptions(
-    system_prompt="你是一個樂於助人的助手。你的母語是中文以台灣口語為主。展示你的工作步驟。",  # 定義 AI 的角色與行為準則
-    max_turns=None,  # 不限制對話輪次（適用於 agent 模式，單次查詢時無影響）
-    model="claude-sonnet-4-5-20250929",  # 指定使用的 Claude 模型版本
-		#api_key="your_claude_api_key_here",  # 請替換為您的 Claude API 金鑰		
-    # 設定並允許外部 MCP 服務與工具
+		system_prompt=system_prompt,  # 定義 AI 的角色與行為準則
+		max_turns=max_turns,  # 不限制對話輪次（適用於 agent 模式，單次查詢時無影響）
+		model=model,  # 指定使用的 Claude 模型版本
+		# 設定並允許外部 MCP 服務與工具
 		mcp_servers={
-      "fetch":{
-        "command":"uvx",
-        "args":["mcp-server-fetch"]
-      }
-    },
-    allowed_tools=["mcp__fetch__fetch"]
+			"fetch":{
+				"command":"uvx",
+				"args":["mcp-server-fetch"]
+			}
+		},
+		allowed_tools=["mcp__fetch__fetch"]
 	)
+
+	print(f"✓ 使用模型: {model}\n")
 
 	# 使用非同步上下文管理器建立 Claude SDK 客戶端
 	async with ClaudeSDKClient(options=options) as client:

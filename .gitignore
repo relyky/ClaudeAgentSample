@@ -8,3 +8,18 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Environment variables (敏感資訊)
+.env.local
+*.local.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
