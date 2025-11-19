@@ -6,7 +6,7 @@
 from mcp.server.fastmcp import FastMCP
 
 # Create an MCP server
-mcp = FastMCP("LocalMcpSample")
+mcp = FastMCP("local-mcp-sample")
 
 # Add an addition tool
 @mcp.tool()
