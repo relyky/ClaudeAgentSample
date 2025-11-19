@@ -1,49 +1,27 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+本方案包含兩個專案,每個專案有各自的 CLAUDE.md 指引。
 
-## 專案概述
+## 專案結構
 
-這是一個使用 **Claude Agent SDK** 的 Python 互動式命令列應用程式,採用 **uv** 作為套件管理器。
+### ClaudeAgentSample
 
-### 核心功能
-- 透過命令列與 Claude AI 進行互動式對話
-- 整合 MCP (Model Context Protocol) 支援外部工具呼叫
-- 支援多輪對話與工具使用追蹤
+Claude Agent SDK 互動式應用程式。
 
-## Python 版本需求
+詳細開發指引請參閱: [ClaudeAgentSample/CLAUDE.md](./ClaudeAgentSample/CLAUDE.md)
 
-- **Python 3.14+**
+### LocalMCPSample
 
-## 核心依賴
+本地 MCP Server 開發範例。
 
-- `claude-agent-sdk==0.1.7` - Claude Agent 官方 SDK
-- `python-dotenv==1.2.1` - 環境變數管理
+詳細開發指引請參閱: [LocalMCPSample/CLAUDE.md](./LocalMCPSample/CLAUDE.md) (尚未建立)
 
-## 環境變數
+## 通用設定
 
-優先順序: `.env.dev` > `.env`
+### 語言與編碼
+- 用繁體中文進行對話
+- 程式碼檔案編碼一律使用 UTF-8
 
-- `.env` - 基礎設定範本(已納入版控)
-- `.env.dev` - 開發環境設定(已納入版控)
-
-## 執行應用程式
-
-```bash
-# 安裝依賴
-uv sync
-
-# 啟動互動式對話
-uv run main.py
-```
-
-## 專案架構
-
-### 核心檔案
-
-- **`main.py`** - 應用程式進入點,實作互動式對話迴圈與 MCP fetch 伺服器整合
-- **`load_env_files.py`** - 環境變數載入與驗證模組
-
-### MCP 整合
-
-使用 `uvx mcp-server-fetch` 提供網路抓取能力,在 `main.py` 的 `ClaudeAgentOptions` 中設定。
+### Python 版本
+- 所有專案統一使用 Python 3.14+
+- 使用 uv 作為套件管理器
