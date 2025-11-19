@@ -26,6 +26,9 @@ uv run server.py
 (待補充)
 
 ## 參考資源
-
+- [使用 uv 輔助開發 MCP 伺服器並安裝到 Claude Desktop 與 VS Code](https://blog.miniasp.com/post/2025/04/01/Write-your-own-MCP-server-using-uv-and-Python)
+- [MCP Resources & Templates](https://gofastmcp.com/servers/resources)
+- [MCP Resources explained (and how they differ from MCP Tools)](https://medium.com/@laurentkubaski/mcp-resources-explained-and-how-they-differ-from-mcp-tools-096f9d15f767)
 - [MCP 官方文件](https://modelcontextprotocol.io/)
 - [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk)
+- [FastMCP 官方文件](https://github.com/anthropics/anthropic-sdk-python)
