@@ -12,16 +12,16 @@ from dotenv import load_dotenv
 def load_env_files():
 	"""
 	載入環境變數檔案
-	優先順序: .env.local > .env
+	優先順序: .env.dev > .env
 
-	.env        - 基礎設定檔 (可提交到版本控制)
-	.env.local  - 本地設定檔 (包含敏感資訊,不提交到版本控制)
+	.env      - 基礎設定檔範本 (已納入版控,使用預設/範例值)
+	.env.dev  - 開發環境設定檔 (已納入版控,包含開發團隊共用設定)
 	"""
 	# 取得當前模組所在目錄作為專案根目錄
 	project_root = Path(__file__).parent
 
 	env_path = project_root / ".env"
-	env_local_path = project_root / ".env.local"
+	env_dev_path = project_root / ".env.dev"
 
 	# 先載入 .env (基礎設定)
 	if env_path.exists():
@@ -30,10 +30,10 @@ def load_env_files():
 	else:
 		print(f"⚠ 找不到 {env_path}")
 
-	# 再載入 .env.local (覆蓋本地設定)
-	if env_local_path.exists():
-		load_dotenv(env_local_path, override=True)
-		print(f"✓ 已載入 {env_local_path}")
+	# 再載入 .env.dev (覆蓋開發環境設定)
+	if env_dev_path.exists():
+		load_dotenv(env_dev_path, override=True)
+		print(f"✓ 已載入 {env_dev_path}")
 
 
 def get_env_value(key: str, default: str = None) -> str:
