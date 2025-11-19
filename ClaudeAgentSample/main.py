@@ -34,7 +34,16 @@ async def main():
 				"args":["mcp-server-fetch"]
 			}
 		},
-		allowed_tools=["mcp__fetch__fetch"]
+		# 允許的工具清單:
+		# - mcp__fetch__fetch: 透過 MCP server 提供的網頁抓取工具
+		# - web_search: Claude API 原生網路搜尋工具(無需 MCP server)
+		#   成功啟動條件:
+		#   1. 使用 Claude Sonnet 4.5+ 或 Haiku 4.5+ 模型
+		#   2. 有效的 Anthropic API 金鑰
+		#   3. API 帳戶支援 WebSearch 功能
+		#   4. 注意: 每 1,000 次搜尋收費 $10 USD (加上標準 token 費用)
+		#   5. 目前僅在美國地區可用
+		allowed_tools=["mcp__fetch__fetch", "web_search"]
 	)
 
 	print(f"✓ 使用模型: {model}\n")
