@@ -19,7 +19,7 @@ async def main():
 
 	# 讀取參數值
 	model = get_env_value("CLAUDE_MODEL", "claude-sonnet-4-5-20250929")
-	system_prompt = get_env_value("CLAUDE_SYSTEM_PROMPT","你是一個樂於助人的助手。你的母語是中文以台灣口語為主。展示你的工作步驟。")
+	system_prompt = get_env_value("CLAUDE_SYSTEM_PROMPT","你是一個樂於助人的助手。你的母語是中文(台灣口語)。展示你的工作步驟。")
 	max_turns = get_env_value_as_int("MAX_TURNS", None)
 
 	# ClaudeAgentOptions 用於設定 AI 模型的行為參數
@@ -48,7 +48,11 @@ async def main():
 		#   3. API 帳戶支援 WebSearch 功能
 		#   4. 注意: 每 1,000 次搜尋收費 $10 USD (加上標準 token 費用)
 		#   5. 目前僅在美國地區可用
-		allowed_tools=["mcp__fetch__fetch", "mcp__local-mcp-sample__add", "web_search"]
+		allowed_tools=[
+			"mcp__fetch__fetch", 
+			"mcp__local-mcp-sample__add", 
+			"web_search"
+		]
 	)
 
 	print(f"✓ 使用模型: {model}\n")
