@@ -14,7 +14,7 @@ async def main():
 		is_valid, error_msg = validate_api_key()
 		if not is_valid:
 			print(f"❌ 錯誤: {error_msg}")
-			print("請在 .env.local 檔案中設定您的 API 金鑰")
+			print("請在 .env 檔案中設定您的 API 金鑰")
 			return
 
 	# 讀取參數值
