@@ -1,8 +1,14 @@
 import asyncio
-import msvcrt
-from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, AssistantMessage, TextBlock, ResultMessage, ToolUseBlock
+import sys
+from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, AssistantMessage, TextBlock, ToolUseBlock
 from claude_agent_sdk.types import PreToolUseHookInput, PostToolUseHookInput, HookContext, SyncHookJSONOutput, HookMatcher
 from load_env_files import is_debug_mode, load_env_files, get_env_value, get_env_value_as_int, validate_api_key
+
+# 平台相依的 import - Windows 限定
+if sys.platform == 'win32':
+	import msvcrt
+else:
+	msvcrt = None
 
 async def log_tool_use(
 	input_data: PreToolUseHookInput | PostToolUseHookInput,
@@ -20,11 +26,16 @@ async def log_tool_use(
 		print(f"[Hooks.PostToolUse: ✅ {tool_name}]", flush=True)
 
 	return {
+		"hookEventName": hook_event,
 		"continue_": True,
 	}
 
 async def check_escape_key(cancel_flag: dict):
-	"""背景任務: 檢查是否按下 ESC 鍵"""
+	"""背景任務: 檢查是否按下 ESC 鍵 (僅支援 Windows)"""
+	# 非 Windows 平台不支援 ESC 鍵檢測
+	if msvcrt is None:
+		return
+
 	loop = asyncio.get_event_loop()
 
 	def check_key():
@@ -82,6 +93,7 @@ async def main():
 		# 允許的工具清單:
 		# - mcp__fetch__fetch: 透過 MCP server 提供的網頁抓取工具
 		# - mcp__local-mcp-sample__add: 本地自訂 MCP server 的加法工具 (LocalMCPSample/server.py)
+		# - mcp__local-mcp-sample__get_weather: 本地自訂 MCP server 的天氣查詢工具 (LocalMCPSample/server.py)
 		# - web_search: Claude API 原生網路搜尋工具(無需 MCP server)
 		#   成功啟動條件:
 		#   1. 使用 Claude Sonnet 4.5+ 或 Haiku 4.5+ 模型
@@ -92,6 +104,7 @@ async def main():
 		allowed_tools=[
 			"mcp__fetch__fetch",
 			"mcp__local-mcp-sample__add",
+			"mcp__local-mcp-sample__get_weather",
 			"web_search"
 		],
 		# 配置 PreToolUse 和 PostToolUse hooks 用於記錄工具使用情況
@@ -117,7 +130,9 @@ async def main():
 	async with ClaudeSDKClient(options=options) as client:
 		print("=== Claude Agent 簡易互動模式 ===")
 		print("輸入您的問題,或輸入 'exit' 或 'quit' 離開")
-		print("在 AI 回應時按 ESC 鍵可中斷運算\n")
+		if msvcrt is not None:
+			print("在 AI 回應時按 ESC 鍵可中斷運算")
+		print()
 
 		while True:
 			# 取得使用者輸入
@@ -149,7 +164,8 @@ async def main():
 
 				# 處理回應
 				print("Claude: ", end="", flush=True)
-				print("(按 ESC 鍵中斷) ", end="", flush=True)
+				if msvcrt is not None:
+					print("(按 ESC 鍵中斷) ", end="", flush=True)
 				has_content = False
 				interrupted = False
 
@@ -165,12 +181,14 @@ async def main():
 						if isinstance(message, AssistantMessage):
 							for block in message.content:
 								if isinstance(block, TextBlock):
-									print(f"\n[TextBlock]", flush=True)  # for debug 正式版不需要。
+									if is_debug_mode():
+										print(f"\n[DEBUG:TextBlock]", flush=True)
 									print(block.text, end="", flush=True)
 									has_content = True  # 有文字回應
 								elif isinstance(block, ToolUseBlock):
-									# 顯示工具使用訊息
-									print(f"\n[ToolUseBlock:{block.name}]", flush=True)  # for debug 正式版不需要。
+									# 工具使用訊息由 PreToolUse/PostToolUse hooks 處理
+									if is_debug_mode():
+										print(f"\n[DEBUG:ToolUseBlock:{block.name}]", flush=True)
 									has_content = True # 有工具使用回應
 
 					# 回應結束後的處理
