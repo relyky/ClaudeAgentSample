@@ -1,7 +1,27 @@
 import asyncio
 import msvcrt
 from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, AssistantMessage, TextBlock, ResultMessage, ToolUseBlock
+from claude_agent_sdk.types import PreToolUseHookInput, PostToolUseHookInput, HookContext, SyncHookJSONOutput, HookMatcher
 from load_env_files import is_debug_mode, load_env_files, get_env_value, get_env_value_as_int, validate_api_key
+
+async def log_tool_use(
+	input_data: PreToolUseHookInput | PostToolUseHookInput,
+	tool_use_id: str | None,
+	context: HookContext,
+) -> SyncHookJSONOutput:
+	"""通用 hook: 在工具執行前後以簡潔模式通知使用者"""
+	tool_name = input_data["tool_name"]
+	hook_event = input_data["hook_event_name"]
+
+	# 根據不同的 hook 類型顯示不同的訊息
+	if hook_event == "PreToolUse":
+		print(f"\n[Hooks.PreToolUse : 🔧 {tool_name}]", flush=True)
+	elif hook_event == "PostToolUse":
+		print(f"[Hooks.PostToolUse: ✅ {tool_name}]", flush=True)
+
+	return {
+		"continue_": True,
+	}
 
 async def check_escape_key(cancel_flag: dict):
 	"""背景任務: 檢查是否按下 ESC 鍵"""
@@ -70,10 +90,25 @@ async def main():
 		#   4. 注意: 每 1,000 次搜尋收費 $10 USD (加上標準 token 費用)
 		#   5. 目前僅在美國地區可用
 		allowed_tools=[
-			"mcp__fetch__fetch", 
-			"mcp__local-mcp-sample__add", 
+			"mcp__fetch__fetch",
+			"mcp__local-mcp-sample__add",
 			"web_search"
-		]
+		],
+		# 配置 PreToolUse 和 PostToolUse hooks 用於記錄工具使用情況
+		hooks={
+			"PreToolUse": [
+				HookMatcher(
+					matcher=None,  # None 表示匹配所有工具
+					hooks=[log_tool_use],
+				)
+			],
+			"PostToolUse": [
+				HookMatcher(
+					matcher=None,  # None 表示匹配所有工具
+					hooks=[log_tool_use],
+				)
+			],
+		}
 	)
 
 	print(f"✓ 使用模型: {model}\n")
@@ -130,12 +165,13 @@ async def main():
 						if isinstance(message, AssistantMessage):
 							for block in message.content:
 								if isinstance(block, TextBlock):
+									print(f"\n[TextBlock]", flush=True)  # for debug 正式版不需要。
 									print(block.text, end="", flush=True)
-									has_content = True
+									has_content = True  # 有文字回應
 								elif isinstance(block, ToolUseBlock):
 									# 顯示工具使用訊息
-									print(f"\n[使用工具: {block.name}]", end="", flush=True)
-									has_content = True
+									print(f"\n[ToolUseBlock:{block.name}]", flush=True)  # for debug 正式版不需要。
+									has_content = True # 有工具使用回應
 
 					# 回應結束後的處理
 					if not has_content and not interrupted:
