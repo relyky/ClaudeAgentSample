@@ -1,6 +1,27 @@
 import asyncio
+import msvcrt
 from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, AssistantMessage, TextBlock, ResultMessage, ToolUseBlock
 from load_env_files import is_debug_mode, load_env_files, get_env_value, get_env_value_as_int, validate_api_key
+
+async def check_escape_key(cancel_flag: dict):
+	"""背景任務: 檢查是否按下 ESC 鍵"""
+	loop = asyncio.get_event_loop()
+
+	def check_key():
+		"""檢查鍵盤輸入 (在執行器中運行以避免阻塞)"""
+		if msvcrt.kbhit():
+			key = msvcrt.getch()
+			return key == b'\x1b'  # ESC 鍵的編碼
+		return False
+
+	while not cancel_flag.get('stop', False):
+		try:
+			if await loop.run_in_executor(None, check_key):
+				cancel_flag['cancelled'] = True
+				return
+			await asyncio.sleep(0.05)  # 每 50ms 檢查一次
+		except Exception:
+			break
 
 async def main():
 	# 載入環境變數
@@ -60,7 +81,8 @@ async def main():
 	# 使用非同步上下文管理器建立 Claude SDK 客戶端
 	async with ClaudeSDKClient(options=options) as client:
 		print("=== Claude Agent 簡易互動模式 ===")
-		print("輸入您的問題,或輸入 'exit' 或 'quit' 離開\n")
+		print("輸入您的問題,或輸入 'exit' 或 'quit' 離開")
+		print("在 AI 回應時按 ESC 鍵可中斷運算\n")
 
 		while True:
 			# 取得使用者輸入
@@ -86,23 +108,48 @@ async def main():
 			try:
 				await client.query(user_input)
 
+				# 設定取消標記與啟動 ESC 鍵監聽
+				cancel_flag = {'cancelled': False, 'stop': False}
+				escape_task = asyncio.create_task(check_escape_key(cancel_flag))
+
 				# 處理回應
 				print("Claude: ", end="", flush=True)
+				print("(按 ESC 鍵中斷) ", end="", flush=True)
 				has_content = False
-				async for message in client.receive_response():
-					if isinstance(message, AssistantMessage):
-						for block in message.content:
-							if isinstance(block, TextBlock):
-								print(block.text, end="", flush=True)
-								has_content = True
-							elif isinstance(block, ToolUseBlock):
-								# 顯示工具使用訊息
-								print(f"\n[使用工具: {block.name}]", end="", flush=True)
-								has_content = True
+				interrupted = False
 
-				if not has_content:
-					print("(無回應內容)", end="", flush=True)
-				print("\n")  # 換行以分隔對話
+				try:
+					async for message in client.receive_response():
+						# 檢查是否按下 ESC 鍵
+						if cancel_flag.get('cancelled', False):
+							interrupted = True
+							print("\n\n⚠️  [使用者按下 ESC，中斷回應]", flush=True)
+							break
+
+						# 顯示回應內容
+						if isinstance(message, AssistantMessage):
+							for block in message.content:
+								if isinstance(block, TextBlock):
+									print(block.text, end="", flush=True)
+									has_content = True
+								elif isinstance(block, ToolUseBlock):
+									# 顯示工具使用訊息
+									print(f"\n[使用工具: {block.name}]", end="", flush=True)
+									has_content = True
+
+					# 回應結束後的處理
+					if not has_content and not interrupted:
+						print("(無回應內容)", end="", flush=True)
+					if not interrupted:
+						print("\n")  # 換行以分隔對話
+
+				finally:
+					# 停止 ESC 鍵監聽任務
+					cancel_flag['stop'] = True
+					try:
+						await asyncio.wait_for(escape_task, timeout=1.0)
+					except asyncio.TimeoutError:
+						escape_task.cancel()
 
 			except Exception as e:
 				print(f"\n錯誤: {type(e).__name__}: {e}\n", flush=True)
