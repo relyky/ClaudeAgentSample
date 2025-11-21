@@ -8,7 +8,9 @@
       "Bash(python -c:*)",
       "Bash(uv run python:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(python -m py_compile:*)",
+      "Bash(uv run:*)"
     ],
     "deny": [],
     "ask": []

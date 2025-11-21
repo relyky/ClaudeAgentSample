@@ -87,7 +87,7 @@ async def main():
 			},
 			"local-mcp-sample":{
 				"command":"uv",
-				"args":["run", "--with", "mcp[cli]", "mcp", "run", "..\\LocalMCPSample\\server.py"]
+				"args":["run", "--directory", "..\\LocalMCPSample", "mcp", "run", "server.py"]
 			}
 		},
 		# 允許的工具清單:
