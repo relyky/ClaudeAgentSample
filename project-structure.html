@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClaudeAgentSample 專案結構圖</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                fontSize: '16px',
+                fontFamily: 'Microsoft JhengHei, sans-serif'
+            }
+        });
+    </script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 40px;
+            border-bottom: 2px solid #2196F3;
+            padding-bottom: 8px;
+        }
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        .mermaid {
+            text-align: center;
+        }
+        pre {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+        }
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #2196F3;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏗️ ClaudeAgentSample 專案結構視覺化圖表</h1>
+
+    <div class="info-box">
+        <strong>📌 說明：</strong>本頁面包含專案資料流向、詳細目錄結構與核心功能模組圖表。
+    </div>
+
+    <h2>1️⃣ 資料流向</h2>
+    <div class="diagram-container">
+        <div class="mermaid">
+sequenceDiagram
+    participant User as 👤 使用者
+    participant CLI as ClaudeAgentSample<br/>(main.py)
+    participant SDK as Claude Agent SDK
+    participant MCP as MCP Server<br/>(LocalMCPSample)
+    participant Claude as 🤖 Claude AI
+
+    User->>CLI: 輸入指令/問題
+    CLI->>SDK: 初始化 Agent
+    SDK->>MCP: 載入 MCP 工具
+    MCP-->>SDK: 註冊工具 (get_weather 等)
+    SDK->>Claude: 發送請求 + MCP 工具
+    Claude->>Claude: 分析需求
+
+    alt 需要使用工具
+        Claude->>MCP: 呼叫 MCP 工具
+        MCP->>MCP: 執行工具邏輯
+        MCP-->>Claude: 回傳結果
+    end
+
+    Claude-->>SDK: 生成回應
+    SDK-->>CLI: 回傳結果
+    CLI-->>User: 顯示回應
+
+    Note over User,Claude: 支援多輪對話循環
+        </div>
+    </div>
+
+    <h2>2️⃣ 詳細目錄結構</h2>
+    <div class="diagram-container">
+        <pre><code>ClaudeAgentSample/
+├── 📄 CLAUDE.md                                # 通用開發指引
+├── 📄 README.md                                # 方案說明文件
+├── 📄 .gitignore                               # Git 忽略設定
+├── 📊 The Agentic AI Simple Stack.pptx         # 簡報檔案
+│
+├── 📁 .claude/                                 # Claude Code 配置
+│   ├── 📄 settings.local.json                  # 本地設定
+│   └── 📁 agents/                              # 自訂 Agent
+│       ├── 📄 code-reviewer.md                 # 程式碼審查專家
+│       ├── 📄 data-scientist.md                # 資料科學專家
+│       ├── 📄 debugger.md                      # 除錯專家
+│       ├── 📄 prd-writer.md                    # PRD 撰寫專家
+│       ├── 📄 steering-architect.md            # 專案架構師
+│       ├── 📄 strategic-planner.md             # 策略規劃師
+│       └── 📄 task-executor.md                 # 任務執行器
+│
+├── 📁 ClaudeAgentSample/                       # Claude Agent SDK 應用
+│   ├── 📄 pyproject.toml                       # 依賴: claude-agent-sdk, mcp, dotenv
+│   ├── 📄 CLAUDE.md                            # 開發指引
+│   ├── 📄 README.md
+│   ├── 📄 .python-version                      # 3.14+
+│   ├── 📄 requirements.txt
+│   ├── 📄 uv.lock
+│   ├── 🔧 .env                                 # 基礎配置
+│   ├── 🔧 .env.dev                             # 開發配置
+│   ├── 🐍 main.py                              # 互動式 CLI 主程式
+│   ├── 🐍 load_env_files.py                    # 環境變數載入
+│   └── 📁 .venv/
+│
+└── 📁 LocalMCPSample/                          # MCP Server 範例
+    ├── 📄 pyproject.toml                       # 依賴: mcp, aiohttp
+    ├── 📄 README.md
+    ├── 📄 .python-version                      # 3.14+
+    ├── 📄 uv.lock
+    ├── 🐍 main.py                              # Server 啟動入口
+    ├── 🐍 server.py                            # MCP Server 實作 (get_weather)
+    └── 📁 .venv/</code></pre>
+    </div>
+
+    <h2>3️⃣ 核心功能模組</h2>
+    <div class="diagram-container">
+        <div class="mermaid">
+graph TD
+    subgraph "ClaudeAgentSample/main.py"
+        M1[互動式對話迴圈]
+        M2[MCP Fetch Server 整合]
+        M3[多輪對話追蹤]
+        M4[工具呼叫處理]
+    end
+
+    subgraph "ClaudeAgentSample/load_env_files.py"
+        E1[載入 .env.dev]
+        E2[載入 .env]
+        E3[環境變數驗證]
+        E1 -.優先.-> E2
+    end
+
+    subgraph "LocalMCPSample/server.py"
+        S1[MCP Server 初始化]
+        S2[get_weather 工具]
+        S3[資源與提示定義]
+        S4[StdIO 傳輸]
+    end
+
+    M2 --> S1
+    M1 --> M4
+    M4 --> S2
+
+    style M1 fill:#e8f5e9
+    style S1 fill:#f3e5f5
+    style E1 fill:#fff4e6
+        </div>
+    </div>
+
+    <div class="info-box" style="margin-top: 40px; background: #f1f8e9; border-left-color: #4CAF50;">
+        <strong>✅ 圖表生成完成！</strong><br>
+        專案結構圖表已成功渲染。您可以：
+        <ul>
+            <li>直接在瀏覽器中查看本頁面</li>
+            <li>查看 <code>project-structure.md</code> 檔案（適用於 VS Code、GitHub）</li>
+            <li>分享或列印本頁面作為文件參考</li>
+        </ul>
+    </div>
+</body>
+</html>
