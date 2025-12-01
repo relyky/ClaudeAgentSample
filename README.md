@@ -58,3 +58,25 @@ uv run server.py
 - [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk)
 - [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)
 - [Anthropic Documentation](https://docs.anthropic.com/)
+
+
+# SIT-測試提問
+
+```
+您: 
+我叫 John
+我是誰？你有我的相關資訊？
+用一段話總結此網址內容 https://rely-ky.gitbook.io/net8/cloud/redis-yan-jiu-bi-ji
+3 + 4
+use local-mcp-sample, 3 + 7
+上網查詢今天新北市天氣
+向 Steven 問安
+查看資源 @local-mcp-sample:greeting://Steven
+向 Steven 問安
+
+What's the weather in San Francisco?
+use local-mcp-sample, 查詢天氣,地點經緯度座標 25.0330° N, 121.5654° E
+
+台北現在的溫度是多少？經緯度是 25.0330, 121.5654
+舊金山現在天氣如何?
+```
