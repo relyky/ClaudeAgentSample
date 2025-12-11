@@ -74,24 +74,18 @@ async def main():
 	max_turns = get_env_value_as_int("MAX_TURNS", None)
 
 	system_prompt = """
-You are a professional assistant whose native language is Taiwanese Traditional Chinese (zh-TW).
+You are a professional assistant whose native language is Taiwanese Traditional Chinese [zh-TW].
 
 **Response Principles:**
-- Provide the conclusion directly, and elaborate only if necessary.
-- Present key points using bullet/list format.
-- Display the essential reasoning steps.
+- Demonstrate your work process.
 - Omit greetings and small talk.
 """
 
 ## ※ system prompt 用英文效果更好。
 # 	system_prompt = """
 # 你是專業助手，母語為台灣繁體中文(zh-TW)。
-#
-# **回應原則：**
-# - 直接給結論，必要時再展開說明
-# - 條列式呈現重點
-# - 顯示關鍵推理步
-# - 省略寒暄問候
+# - 展示你的工作步驟。
+# - 省略寒暄問候。
 # """
 
 	# ClaudeAgentOptions 用於設定 AI 模型的行為參數
@@ -223,7 +217,7 @@ You are a professional assistant whose native language is Taiwanese Traditional 
 						# 處理 ResultMessage 以顯示 token 統計
 						elif isinstance(message, ResultMessage):
 							if is_debug_mode():
-								print(f"\n[DEBUG:ResultMessage]", flush=True)
+								print(f"\n[DEBUG:ResultMessage]", flush=True, end="")
 
 							if message.usage:
 								input_tokens = message.usage.get('input_tokens', 0)
