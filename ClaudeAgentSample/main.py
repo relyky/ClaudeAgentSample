@@ -142,6 +142,14 @@ async def main():
 
 	# 使用非同步上下文管理器建立 Claude SDK 客戶端
 	async with ClaudeSDKClient(options=options) as client:
+		# 初始化 session 累積統計
+		session_stats = {
+			'total_input_tokens': 0,
+			'total_output_tokens': 0,
+			'total_cost_usd': 0.0,
+			'turn_count': 0
+		}
+
 		print("=== Claude Agent 簡易互動模式 ===")
 		print("輸入您的問題,或輸入 'exit' 或 'quit' 離開")
 		if msvcrt is not None:
@@ -214,10 +222,30 @@ async def main():
 								input_tokens = message.usage.get('input_tokens', 0)
 								output_tokens = message.usage.get('output_tokens', 0)
 								total_tokens = input_tokens + output_tokens
-								print(f"\n📊 Tokens: 輸入={input_tokens} / 輸出={output_tokens} / 總計={total_tokens}", end="", flush=True)
 
-							if message.total_cost_usd:
-								print(f" | 💰 成本: ${message.total_cost_usd:.6f} USD", end="", flush=True)
+								# 更新累積統計
+								session_stats['total_input_tokens'] += input_tokens
+								session_stats['total_output_tokens'] += output_tokens
+								session_stats['turn_count'] += 1
+
+								if message.total_cost_usd:
+									session_stats['total_cost_usd'] += message.total_cost_usd
+
+								# 顯示當次統計
+								print(f"\n📊 本輪 Tokens: 輸入={input_tokens} / 輸出={output_tokens} / 總計={total_tokens}", end="", flush=True)
+
+								if message.total_cost_usd:
+									print(f" | 💰 ${message.total_cost_usd:.6f} USD", end="", flush=True)
+
+								# 顯示累積統計
+								total_session_tokens = session_stats['total_input_tokens'] + session_stats['total_output_tokens']
+								print(f"\n📈 累積統計: 輸入={session_stats['total_input_tokens']} / "
+								      f"輸出={session_stats['total_output_tokens']} / "
+								      f"總計={total_session_tokens} / "
+								      f"輪次={session_stats['turn_count']}", end="", flush=True)
+
+								if session_stats['total_cost_usd'] > 0:
+									print(f" | 💰 累積成本: ${session_stats['total_cost_usd']:.6f} USD", end="", flush=True)
 
 					# 回應結束後的處理
 					if not has_content and not interrupted:
