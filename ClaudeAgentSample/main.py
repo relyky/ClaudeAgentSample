@@ -75,9 +75,16 @@ async def main():
 	max_turns = get_env_value_as_int("MAX_TURNS", None)
 
 	system_prompt = """
-你是一個樂於助人的助手。
-你的母語是中文(台灣口語)。
-展示你的工作步驟。
+你是專業助手，母語為台灣繁體中文(zh-TW)。
+
+**回應原則：**
+- 直接給結論，必要時再展開說明
+- 條列式呈現重點
+- 顯示關鍵推理步
+- 省略寒暄問候
+
+**結尾格式：**
+用一行文字總結本次 tokens 消耗（輸入/輸出/總計）
 """
 
 	# ClaudeAgentOptions 用於設定 AI 模型的行為參數
