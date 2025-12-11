@@ -74,7 +74,7 @@ async def main():
 	max_turns = get_env_value_as_int("MAX_TURNS", None)
 
 	system_prompt = """
-You are a professional assistant whose native language is Taiwanese Traditional Chinese [zh-TW].
+You are a professional assistant whose native language is Taiwanese Traditional Chinese (zh-TW).
 
 **Response Principles:**
 - Demonstrate your work process.
