@@ -71,18 +71,28 @@ async def main():
 
 	# 讀取參數值
 	model = get_env_value("CLAUDE_MODEL", "claude-sonnet-4-5-20250929")
-	#system_prompt = get_env_value("CLAUDE_SYSTEM_PROMPT","你是一個樂於助人的助手。你的母語是中文(台灣口語)。展示你的工作步驟。")
 	max_turns = get_env_value_as_int("MAX_TURNS", None)
 
 	system_prompt = """
-你是專業助手，母語為台灣繁體中文(zh-TW)。
+You are a professional assistant whose native language is Taiwanese Traditional Chinese (zh-TW).
 
-**回應原則：**
-- 直接給結論，必要時再展開說明
-- 條列式呈現重點
-- 顯示關鍵推理步
-- 省略寒暄問候
+**Response Principles:**
+- Provide the conclusion directly, and elaborate only if necessary.
+- Present key points using bullet/list format.
+- Display the essential reasoning steps.
+- Omit greetings and small talk.
 """
+
+## ※ system prompt 用英文效果更好。
+# 	system_prompt = """
+# 你是專業助手，母語為台灣繁體中文(zh-TW)。
+#
+# **回應原則：**
+# - 直接給結論，必要時再展開說明
+# - 條列式呈現重點
+# - 顯示關鍵推理步
+# - 省略寒暄問候
+# """
 
 	# ClaudeAgentOptions 用於設定 AI 模型的行為參數
 	options = ClaudeAgentOptions(
@@ -105,12 +115,12 @@ async def main():
 		# - mcp__local-mcp-sample__add: 本地自訂 MCP server 的加法工具 (LocalMCPSample/server.py)
 		# - mcp__local-mcp-sample__get_weather: 本地自訂 MCP server 的天氣查詢工具 (LocalMCPSample/server.py)
 		# - web_search: Claude API 原生網路搜尋工具(無需 MCP server)
-		#   成功啟動條件:
-		#   1. 使用 Claude Sonnet 4.5+ 或 Haiku 4.5+ 模型
-		#   2. 有效的 Anthropic API 金鑰
-		#   3. API 帳戶支援 WebSearch 功能
-		#   4. 注意: 每 1,000 次搜尋收費 $10 USD (加上標準 token 費用)
-		#   5. 目前僅在美國地區可用
+		#       成功啟動條件:
+		#       1. 使用 Claude Sonnet 4.5+ 或 Haiku 4.5+ 模型
+		#       2. 有效的 Anthropic API 金鑰
+		#       3. API 帳戶支援 WebSearch 功能
+		#       4. 注意: 每 1,000 次搜尋收費 $10 USD (加上標準 token 費用)
+		#       5. 目前僅在美國地區可用
 		allowed_tools=[
 			"mcp__fetch__fetch",
 			"mcp__local-mcp-sample__add",
