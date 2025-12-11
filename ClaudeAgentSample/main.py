@@ -125,6 +125,7 @@ async def main():
 	)
 
 	print(f"✓ 使用模型: {model}\n")
+	print(f"✓ system_prompt: {system_prompt}\n")
 
 	# 使用非同步上下文管理器建立 Claude SDK 客戶端
 	async with ClaudeSDKClient(options=options) as client:
