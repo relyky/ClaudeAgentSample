@@ -17,7 +17,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 核心依賴
 
-- `claude-agent-sdk==0.1.7` - Claude Agent 官方 SDK
+- `claude-agent-sdk>=0.1.14` - Claude Agent 官方 SDK
 - `python-dotenv==1.2.1` - 環境變數管理
 
 ## 環境變數

@@ -5,7 +5,7 @@ description = "Claude Agent SDK Interactive CLI Application"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "claude-agent-sdk==0.1.7",
+    "claude-agent-sdk>=0.1.14",
     "mcp[cli]>=1.21.2",
     "python-dotenv==1.2.1",
 ]

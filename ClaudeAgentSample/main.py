@@ -71,8 +71,14 @@ async def main():
 
 	# 讀取參數值
 	model = get_env_value("CLAUDE_MODEL", "claude-sonnet-4-5-20250929")
-	system_prompt = get_env_value("CLAUDE_SYSTEM_PROMPT","你是一個樂於助人的助手。你的母語是中文(台灣口語)。展示你的工作步驟。")
+	#system_prompt = get_env_value("CLAUDE_SYSTEM_PROMPT","你是一個樂於助人的助手。你的母語是中文(台灣口語)。展示你的工作步驟。")
 	max_turns = get_env_value_as_int("MAX_TURNS", None)
+
+	system_prompt = """
+你是一個樂於助人的助手。
+你的母語是中文(台灣口語)。
+展示你的工作步驟。
+"""
 
 	# ClaudeAgentOptions 用於設定 AI 模型的行為參數
 	options = ClaudeAgentOptions(
