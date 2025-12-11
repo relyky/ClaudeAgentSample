@@ -1,8 +1,0 @@
-# Claude Agent Sample - 主要套件依賴
-# Python 版本: >=3.14
-
-# Claude Agent SDK - 核心套件
-claude-agent-sdk==0.1.7
-
-# 環境變數管理
-python-dotenv==1.2.1
