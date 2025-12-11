@@ -1,6 +1,6 @@
 import asyncio
 import sys
-from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, AssistantMessage, TextBlock, ToolUseBlock
+from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, AssistantMessage, TextBlock, ToolUseBlock, ResultMessage
 from claude_agent_sdk.types import PreToolUseHookInput, PostToolUseHookInput, HookContext, SyncHookJSONOutput, HookMatcher
 from load_env_files import is_debug_mode, load_env_files, get_env_value, get_env_value_as_int, validate_api_key
 
@@ -204,6 +204,20 @@ async def main():
 									if is_debug_mode():
 										print(f"\n[DEBUG:ToolUseBlock:{block.name}]", flush=True)
 									has_content = True # 有工具使用回應
+
+						# 處理 ResultMessage 以顯示 token 統計
+						elif isinstance(message, ResultMessage):
+							if is_debug_mode():
+								print(f"\n[DEBUG:ResultMessage]", flush=True)
+
+							if message.usage:
+								input_tokens = message.usage.get('input_tokens', 0)
+								output_tokens = message.usage.get('output_tokens', 0)
+								total_tokens = input_tokens + output_tokens
+								print(f"\n📊 Tokens: 輸入={input_tokens} / 輸出={output_tokens} / 總計={total_tokens}", end="", flush=True)
+
+							if message.total_cost_usd:
+								print(f" | 💰 成本: ${message.total_cost_usd:.6f} USD", end="", flush=True)
 
 					# 回應結束後的處理
 					if not has_content and not interrupted:
