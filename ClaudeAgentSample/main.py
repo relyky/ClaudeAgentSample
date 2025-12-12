@@ -1,58 +1,8 @@
 import asyncio
-import sys
 from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, AssistantMessage, TextBlock, ToolUseBlock, ResultMessage
-from claude_agent_sdk.types import PreToolUseHookInput, PostToolUseHookInput, HookContext, SyncHookJSONOutput, HookMatcher
+from claude_agent_sdk.types import HookMatcher
 from load_env_files import is_debug_mode, load_env_files, get_env_value, get_env_value_as_int, validate_api_key
-
-# 平台相依的 import - Windows 限定
-if sys.platform == 'win32':
-	import msvcrt
-else:
-	msvcrt = None
-
-async def log_tool_use(
-	input_data: PreToolUseHookInput | PostToolUseHookInput,
-	tool_use_id: str | None,
-	context: HookContext,
-) -> SyncHookJSONOutput:
-	"""通用 hook: 在工具執行前後以簡潔模式通知使用者"""
-	tool_name = input_data["tool_name"]
-	hook_event = input_data["hook_event_name"]
-
-	# 根據不同的 hook 類型顯示不同的訊息
-	if hook_event == "PreToolUse":
-		print(f"\n[Hooks.PreToolUse : 🔧 {tool_name}]", flush=True)
-	elif hook_event == "PostToolUse":
-		print(f"[Hooks.PostToolUse: ✅ {tool_name}]", flush=True)
-
-	return {
-		"hookEventName": hook_event,
-		"continue_": True,
-	}
-
-async def check_escape_key(cancel_flag: dict):
-	"""背景任務: 檢查是否按下 ESC 鍵 (僅支援 Windows)"""
-	# 非 Windows 平台不支援 ESC 鍵檢測
-	if msvcrt is None:
-		return
-
-	loop = asyncio.get_event_loop()
-
-	def check_key():
-		"""檢查鍵盤輸入 (在執行器中運行以避免阻塞)"""
-		if msvcrt.kbhit():
-			key = msvcrt.getch()
-			return key == b'\x1b'  # ESC 鍵的編碼
-		return False
-
-	while not cancel_flag.get('stop', False):
-		try:
-			if await loop.run_in_executor(None, check_key):
-				cancel_flag['cancelled'] = True
-				return
-			await asyncio.sleep(0.05)  # 每 50ms 檢查一次
-		except Exception:
-			break
+from utils import log_tool_use, check_escape_key, is_windows_platform
 
 async def main():
 	# 載入環境變數
@@ -153,7 +103,7 @@ You are a professional assistant whose native language is Taiwanese Traditional 
 
 		print("=== Claude Agent 簡易互動模式 ===")
 		print("輸入您的問題,或輸入 'exit' 或 'quit' 離開")
-		if msvcrt is not None:
+		if is_windows_platform():
 			print("在 AI 回應時按 ESC 鍵可中斷運算")
 		print()
 
@@ -187,7 +137,7 @@ You are a professional assistant whose native language is Taiwanese Traditional 
 
 				# 處理回應
 				print("Claude: ", end="", flush=True)
-				if msvcrt is not None:
+				if is_windows_platform():
 					print("(按 ESC 鍵中斷) ", end="", flush=True)
 				has_content = False
 				interrupted = False

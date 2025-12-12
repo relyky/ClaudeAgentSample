@@ -12,7 +12,9 @@
       "Bash(python -m py_compile:*)",
       "Bash(uv run:*)",
       "Bash(start project-structure.html)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(^d \")",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
