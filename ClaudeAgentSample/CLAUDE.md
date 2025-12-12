@@ -41,8 +41,12 @@ uv run main.py
 
 ### 核心檔案
 
-- **`main.py`** - 應用程式進入點,實作互動式對話迴圈與 MCP fetch 伺服器整合
+- **`main.py`** - 應用程式進入點，實作互動式對話迴圈與 MCP 整合
 - **`load_env_files.py`** - 環境變數載入與驗證模組
+- **`utils.py`** - 工具函式模組，包含：
+  - `log_tool_use()` - 工具使用 hook 函式（PreToolUse/PostToolUse）
+  - `check_escape_key()` - ESC 鍵檢測背景任務（Windows 平台）
+  - `is_windows_platform()` - Windows 平台檢查函式
 
 ### MCP 整合
 

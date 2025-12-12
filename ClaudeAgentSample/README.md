@@ -37,8 +37,9 @@ uv run main.py
 
 ## 專案架構
 
-- **`main.py`** - 應用程式進入點,實作互動式對話迴圈與 MCP fetch 伺服器整合
+- **`main.py`** - 應用程式進入點，實作互動式對話迴圈與 MCP 整合
 - **`load_env_files.py`** - 環境變數載入與驗證模組
+- **`utils.py`** - 工具函式模組，包含 hook 函式與平台檢測功能
 
 ## MCP 整合
 
